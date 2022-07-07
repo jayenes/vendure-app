@@ -8,6 +8,8 @@ import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import path from 'path';
+import { RandomCatPlugin } from './randomCatPlugin';
+import { compileUiExtensions } from '@vendure/ui-devkit/compiler';
 
 export const config: VendureConfig = {
   apiOptions: {
@@ -76,6 +78,33 @@ export const config: VendureConfig = {
     AdminUiPlugin.init({
       route: 'admin',
       port: 3002,
+      app: compileUiExtensions({
+        outputPath: path.join(__dirname, 'admin-ui'),
+        extensions: [
+          {
+            extensionPath: path.join(__dirname, 'ui-extensions'),
+            ngModules: [
+              {
+                type: 'lazy',
+                route: 'greet',
+                ngModuleFileName: 'greeter.module.ts',
+                ngModuleName: 'GreeterModule',
+              },
+              {
+                type: 'shared',
+                ngModuleFileName: 'greeter-shared.module.ts',
+                ngModuleName: 'GreeterSharedModule',
+              },
+              {
+                type: 'shared',
+                ngModuleFileName: 'product-reviews.module.ts',
+                ngModuleName: 'SharedExtensionModule',
+              },
+            ],
+          },
+        ],
+      }),
     }),
+    RandomCatPlugin,
   ],
 };
